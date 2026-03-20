@@ -1,3 +1,14 @@
+def on_logo_long_pressed():
+    motor.motor_stop_all()
+    music._play_default_background(music.built_in_playable_melody(Melodies.POWER_UP),
+        music.PlaybackMode.IN_BACKGROUND)
+    basic.show_icon(IconNames.TARGET)
+    motor.motor_run(motor.Motors.M1, motor.Dir.CW, 255)
+    motor.motor_run(motor.Motors.M2, motor.Dir.CW, 255)
+    motor.motor_run(motor.Motors.M3, motor.Dir.CW, 255)
+    motor.motor_run(motor.Motors.M4, motor.Dir.CW, 255)
+input.on_logo_event(TouchButtonEvent.LONG_PRESSED, on_logo_long_pressed)
+
 def on_button_pressed_a():
     motor.motor_stop_all()
     music.play(music.builtin_playable_sound_effect(soundExpression.happy),
@@ -8,13 +19,6 @@ def on_button_pressed_a():
     motor.motor_run(motor.Motors.M3, motor.Dir.CW, 50)
     motor.motor_run(motor.Motors.M4, motor.Dir.CW, 50)
 input.on_button_pressed(Button.A, on_button_pressed_a)
-
-def on_gesture_tilt_left():
-    motor.motor_stop_all()
-    basic.show_icon(IconNames.ASLEEP)
-    music.play(music.builtin_playable_sound_effect(soundExpression.giggle),
-        music.PlaybackMode.IN_BACKGROUND)
-input.on_gesture(Gesture.TILT_LEFT, on_gesture_tilt_left)
 
 def on_uart_data_received():
     global cmd
@@ -68,8 +72,10 @@ def on_logo_touched():
 input.on_logo_event(TouchButtonEvent.TOUCHED, on_logo_touched)
 
 cmd = ""
+motor.motor_stop_all()
 music.set_volume(255)
 bluetooth.start_uart_service()
 music.play(music.builtin_playable_sound_effect(soundExpression.hello),
     music.PlaybackMode.IN_BACKGROUND)
-basic.show_string("Hello")
+basic.show_string("Pizza")
+basic.show_icon(IconNames.HEART)

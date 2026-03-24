@@ -1,71 +1,66 @@
-input.onLogoEvent(TouchButtonEvent.LongPressed, function () {
-    motor.motorStopAll()
-    music._playDefaultBackground(music.builtInPlayableMelody(Melodies.PowerUp), music.PlaybackMode.InBackground)
-    basic.showIcon(IconNames.Target)
-    motor.MotorRun(motor.Motors.M1, motor.Dir.CW, 255)
-    motor.MotorRun(motor.Motors.M2, motor.Dir.CW, 255)
-    motor.MotorRun(motor.Motors.M3, motor.Dir.CW, 255)
-    motor.MotorRun(motor.Motors.M4, motor.Dir.CW, 255)
+bluetooth.onBluetoothConnected(function () {
+    basic.showIcon(IconNames.Happy)
 })
-input.onButtonPressed(Button.A, function () {
-    motor.motorStopAll()
-    music.play(music.builtinPlayableSoundEffect(soundExpression.happy), music.PlaybackMode.InBackground)
-    basic.showIcon(IconNames.Yes)
-    motor.MotorRun(motor.Motors.M1, motor.Dir.CW, 50)
-    motor.MotorRun(motor.Motors.M2, motor.Dir.CW, 50)
-    motor.MotorRun(motor.Motors.M3, motor.Dir.CW, 50)
-    motor.MotorRun(motor.Motors.M4, motor.Dir.CW, 50)
+bluetooth.onBluetoothDisconnected(function () {
+    basic.showIcon(IconNames.No)
 })
-bluetooth.onUartDataReceived(serial.delimiters(Delimiters.Hash), function () {
-    cmd = bluetooth.uartReadUntil("#")
-    if (cmd == "F") {
-        basic.showString("F")
-        motor.MotorRun(motor.Motors.M1, motor.Dir.CW, 120)
-        motor.MotorRun(motor.Motors.M2, motor.Dir.CW, 120)
-        motor.MotorRun(motor.Motors.M3, motor.Dir.CW, 120)
-        motor.MotorRun(motor.Motors.M4, motor.Dir.CW, 120)
-    } else if (cmd == "B") {
-        basic.showString("B")
-        motor.MotorRun(motor.Motors.M1, motor.Dir.CCW, 120)
-        motor.MotorRun(motor.Motors.M2, motor.Dir.CCW, 120)
-        motor.MotorRun(motor.Motors.M3, motor.Dir.CCW, 120)
-        motor.MotorRun(motor.Motors.M4, motor.Dir.CCW, 120)
-    } else if (cmd == "S") {
-        basic.showString("S")
-        motor.motorStop(motor.Motors.M1)
-        motor.motorStop(motor.Motors.M2)
-        motor.motorStop(motor.Motors.M3)
-        motor.motorStop(motor.Motors.M4)
-    } else if (cmd == "L") {
-        basic.showString("L")
-        motor.motorStopAll()
-        motor.MotorRun(motor.Motors.M1, motor.Dir.CW, 120)
-        motor.MotorRun(motor.Motors.M2, motor.Dir.CW, 120)
-    } else if (cmd == "R") {
-        basic.showString("R")
-        motor.motorStopAll()
-        motor.MotorRun(motor.Motors.M3, motor.Dir.CW, 120)
-        motor.MotorRun(motor.Motors.M4, motor.Dir.CW, 120)
+bluetooth.onUartDataReceived(serial.delimiters(Delimiters.NewLine), function () {
+    msg = bluetooth.uartReadUntil(serial.delimiters(Delimiters.NewLine))
+    // zmiana trybu
+    if (msg == "mode_dpad") {
+        mode = 0
+        basic.showString("D")
+    } else if (msg == "mode_analog") {
+        mode = 1
+        basic.showString("A")
+    } else if (msg == "mode_accelerometer") {
+        mode = 2
+        basic.showString("T")
+    } else {
+        // dpad
+        if (mode == 0) {
+            if (msg == "UP") {
+            	
+            } else if (msg == "DOWN") {
+            	
+            } else if (msg == "LEFT") {
+            	
+            } else if (msg == "RIGHT") {
+            	
+            } else if (msg == "left" || msg == "right" || msg == "up" || msg == "down") {
+            	
+            }
+        }
+        // analog + accelerometer
+        if (mode == 1 || mode == 2) {
+            parseAndDriveAxes(msg)
+        }
     }
 })
-input.onButtonPressed(Button.B, function () {
-    basic.showIcon(IconNames.No)
-    motor.motorStopAll()
-    music.play(music.builtinPlayableSoundEffect(soundExpression.sad), music.PlaybackMode.InBackground)
-})
-input.onLogoEvent(TouchButtonEvent.Touched, function () {
-    motor.motorStopAll()
-    music.play(music.builtinPlayableSoundEffect(soundExpression.slide), music.PlaybackMode.InBackground)
-    basic.showIcon(IconNames.Happy)
-    motor.MotorRun(motor.Motors.M1, motor.Dir.CW, 100)
-    motor.MotorRun(motor.Motors.M2, motor.Dir.CW, 100)
-    motor.MotorRun(motor.Motors.M3, motor.Dir.CW, 100)
-    motor.MotorRun(motor.Motors.M4, motor.Dir.CW, 100)
-})
-let cmd = ""
-motor.motorStopAll()
-music.setVolume(255)
+// format: X+05,Y-72
+function parseAndDriveAxes (frame: string) {
+    if (frame.length < 9) {
+        return
+    }
+    if (frame.substr(0, 1) != "X") {
+        return
+    }
+    if (frame.substr(4, 2) != ",Y") {
+        return
+    }
+    x = parseFloat(frame.substr(1, 3))
+    y = parseFloat(frame.substr(6, 3))
+    driveFromAxes(x, y)
+}
+function driveFromAxes (ax: number, ay: number) {
+    left = ay - ax
+    right = ay + ax
+}
+let right = 0
+let left = 0
+let y = 0
+let x = 0
+let mode = 0
+let msg = ""
+basic.showIcon(IconNames.SmallDiamond)
 bluetooth.startUartService()
-music.play(music.builtinPlayableSoundEffect(soundExpression.hello), music.PlaybackMode.InBackground)
-basic.showString("Pizza")
-basic.showIcon(IconNames.Heart)
